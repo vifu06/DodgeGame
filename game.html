@@ -9,11 +9,32 @@
             border: 1px solid #d3d3d3;
             background-color: #f1f1f1;
         }
+        #screen {
+            width: 100%;
+            height: 100%;
+            background: #d1cecb9e;
+            z-index: 123;
+            position: absolute;
+        }
+        #canvasHolder {
+            position: relative;
+            width: fit-content;
+        }
+        #screen {
+            justify-content: center;
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 
 <body onload="setupGame()">
     <p>Test Game</p>
+    <div id="canvasHolder">
+        <div id="screen">
+            <button onclick="startGame()"><img src="./start.png" alt="Start Game"/></button>
+        </div>
+    </div>
 </body>
 
 </html>

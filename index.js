@@ -1,7 +1,10 @@
 let gamePiece;
 let gameCanvas;
 let maxSpeed = 5;
-let obstacle;
+let obstacles = [];
+let obstacleCount = 10;
+let gameStatus = false;
+let obstaclePosition = new Set();
 const gameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
@@ -11,7 +14,8 @@ const gameArea = {
         this.context = this.canvas.getContext("2d");
         this.canvas.tabIndex = 1;
         this.canvas.autofocus = true;
-        document.body.append(this.canvas);
+        document.getElementById('canvasHolder').append(this.canvas)
+        //  document.body.append();
         this.interval = setInterval(updateGameArea, 20);
     },
     clear : function() {
@@ -23,11 +27,42 @@ const gameArea = {
 }
 
 function setupGame() {
-    console.log("Game starts");
+    console.log("Game setup");
     gameArea.start();
     gameCanvas = document.getElementById('gameArea');
     gamePiece = new Component(30,30,"red",10,120);
-    obstacle = new Component(30,30,"green",gameCanvas.width-30,20);
+    generateObstacles();
+}
+
+function startGame() {
+    console.log("Game starts");
+    document.getElementById("screen").style.display = "none";
+    gameStatus = true;
+}
+
+async function generateObstacles() {
+    let iteration = 1;
+    await generateObstaclePosition();
+    obstaclePosition.forEach((pos)=>{
+        setTimeout(()=>{
+            obstacles.push(new Component(30,30,"green",gameCanvas.width-30,pos));
+        },iteration *2000);
+        iteration++;
+    });
+}
+
+function generateObstaclePosition() {
+    while (obstaclePosition.size < obstacleCount) {
+        obstaclePosition.add(Math.floor((Math.random() * (gameCanvas.height - 1) + 1)));
+    }
+}
+
+function updateObstacles() {
+    obstacles.forEach((obstacle)=>{
+        obstacle.speedX = -1;
+        obstacle.newPos();
+        obstacle.update();
+    });
 }
 
 class Component {
@@ -59,10 +94,12 @@ class Component {
 }
 
 function updateGameArea() {
-    gameArea.clear();
-    obstacle.update();
-    gamePiece.newPos();
-    gamePiece.update();
+    if(gameStatus) {
+        gameArea.clear();
+        updateObstacles();
+        gamePiece.newPos();
+        gamePiece.update();
+    }
 }
 
 function moveUp() {
