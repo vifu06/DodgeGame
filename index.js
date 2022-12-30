@@ -29,7 +29,7 @@ function setupGame() {
     console.log("Game setup");
     gameArea.start();
     gameCanvas = document.getElementById('gameArea');
-    gamePiece = new Component(90,60,'./assets/player.png',10,120,'img');
+    gamePiece = new Component(110,80,'./assets/player.png',10,120,'img');
     generateObstacles();
 }
 
@@ -44,7 +44,7 @@ function generateObstacles() {
     generateObstaclePosition();
     obstaclePosition.forEach((pos)=>{
         setTimeout(()=>{
-            obstacles.push(new Component(30,30,"green",gameCanvas.width-30,pos,'box'));
+            obstacles.push(new Component(75,50,"./assets/opponent.png",gameCanvas.width-30,pos,'img'));
         },iteration * 2000);
         iteration++;
     });
@@ -52,7 +52,7 @@ function generateObstacles() {
 
 function generateObstaclePosition() {
     while (obstaclePosition.size < obstacleCount) {
-        obstaclePosition.add(Math.floor((Math.random() * ((gameCanvas.height - 30) - 1) + 1)));
+        obstaclePosition.add(Math.floor((Math.random() * ((gameCanvas.height - 50) - 1) + 1)));
     }
 }
 
@@ -104,9 +104,7 @@ class Component {
                 }
             }
             if(type == 'obstacle') {
-                if(this.x >= -30) {
-                    this.x += this.speedX;
-                }
+                this.x += this.speedX;
                 this.y += this.speedY;
             }
         }
