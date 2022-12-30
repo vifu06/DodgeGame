@@ -1,6 +1,6 @@
 let gamePiece;
 let gameCanvas;
-let maxSpeed = 5;
+let maxSpeed = 9;
 let obstacles = [];
 let obstacleCount = 10;
 let gameStatus = false;
@@ -9,13 +9,13 @@ const gameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
         this.canvas.id = "gameArea";
-        this.canvas.width = 480;
-        this.canvas.height = 270;
+        this.canvas.width = 960;
+        this.canvas.height = 540;
         this.context = this.canvas.getContext("2d");
         this.canvas.tabIndex = 1;
         this.canvas.autofocus = true;
         document.getElementById('canvasHolder').append(this.canvas);
-        this.interval = setInterval(updateGameArea, 20);
+        this.interval = setInterval(updateGameArea, 10);
     },
     clear : function() {
         this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
@@ -29,7 +29,7 @@ function setupGame() {
     console.log("Game setup");
     gameArea.start();
     gameCanvas = document.getElementById('gameArea');
-    gamePiece = new Component(30,30,"red",10,120);
+    gamePiece = new Component(90,60,'./assets/player.png',10,120,'img');
     generateObstacles();
 }
 
@@ -44,7 +44,7 @@ function generateObstacles() {
     generateObstaclePosition();
     obstaclePosition.forEach((pos)=>{
         setTimeout(()=>{
-            obstacles.push(new Component(30,30,"green",gameCanvas.width-30,pos));
+            obstacles.push(new Component(30,30,"green",gameCanvas.width-30,pos,'box'));
         },iteration * 2000);
         iteration++;
     });
@@ -62,14 +62,19 @@ function updateObstacles() {
             gameArea.stop();
             return;
         }
-        obstacle.speedX = -1;
+        obstacle.speedX = -3;
         obstacle.newPos('obstacle');
         obstacle.update();
     });
 }
 
 class Component {
-    constructor(width, height, color, x, y) {
+    constructor(width, height, color, x, y, type) {
+        this.type = type;
+        if(type == 'img') {
+            this.image = new Image();
+            this.image.src = color;
+        }
         this.width = width;
         this.height = height;
         this.speedX = 0;
@@ -78,8 +83,12 @@ class Component {
         this.y = y;
         this.update = function() {
             let ctx = gameArea.context;
-            ctx.fillStyle = color;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
+            if(this.type == 'img') {
+                ctx.drawImage(this.image,this.x,this.y,this.width,this.height);
+            } else {
+                ctx.fillStyle = color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
         }
         this.newPos = function(type) {
             if(type == 'player') {
