@@ -14,8 +14,7 @@ const gameArea = {
         this.context = this.canvas.getContext("2d");
         this.canvas.tabIndex = 1;
         this.canvas.autofocus = true;
-        document.getElementById('canvasHolder').append(this.canvas)
-        //  document.body.append();
+        document.getElementById('canvasHolder').append(this.canvas);
         this.interval = setInterval(updateGameArea, 20);
     },
     clear : function() {
@@ -40,27 +39,31 @@ function startGame() {
     gameStatus = true;
 }
 
-async function generateObstacles() {
+function generateObstacles() {
     let iteration = 1;
-    await generateObstaclePosition();
+    generateObstaclePosition();
     obstaclePosition.forEach((pos)=>{
         setTimeout(()=>{
             obstacles.push(new Component(30,30,"green",gameCanvas.width-30,pos));
-        },iteration *2000);
+        },iteration * 2000);
         iteration++;
     });
 }
 
 function generateObstaclePosition() {
     while (obstaclePosition.size < obstacleCount) {
-        obstaclePosition.add(Math.floor((Math.random() * (gameCanvas.height - 1) + 1)));
+        obstaclePosition.add(Math.floor((Math.random() * ((gameCanvas.height - 30) - 1) + 1)));
     }
 }
 
 function updateObstacles() {
     obstacles.forEach((obstacle)=>{
+        if(gamePiece.crashCheck(obstacle)){
+            gameArea.stop();
+            return;
+        }
         obstacle.speedX = -1;
-        obstacle.newPos();
+        obstacle.newPos('obstacle');
         obstacle.update();
     });
 }
@@ -78,17 +81,44 @@ class Component {
             ctx.fillStyle = color;
             ctx.fillRect(this.x, this.y, this.width, this.height);
         }
-        this.newPos = function() {
-            let tx = this.x;
-            let ty = this.y;
-            tx += this.speedX;
-            ty += this.speedY;
-            if(tx > 0 && tx < (gameCanvas.width - gamePiece.width)) {
-                this.x = tx;
+        this.newPos = function(type) {
+            if(type == 'player') {
+                let tx = this.x;
+                let ty = this.y;
+                tx += this.speedX;
+                ty += this.speedY;
+                if(tx > 0 && tx < (gameCanvas.width - gamePiece.width)) {
+                    this.x = tx;
+                }
+                if(ty > 0 && ty < (gameCanvas.height - gamePiece.height)) {
+                    this.y = ty;
+                }
             }
-            if(ty > 0 && ty < (gameCanvas.height - gamePiece.height)) {
-                this.y = ty;
+            if(type == 'obstacle') {
+                if(this.x >= -30) {
+                    this.x += this.speedX;
+                }
+                this.y += this.speedY;
             }
+        }
+        this.crashCheck = function(obstacle) {
+            let piece = {
+                left    : this.x,
+                right   : this.x + this.width,
+                top     : this.y,
+                bottom  : this.y + this.height
+            };
+            let obsPiece = {
+                left    : obstacle.x,
+                right   : obstacle.x + obstacle.width,
+                top     : obstacle.y,
+                bottom  : obstacle.y + obstacle.height
+            }
+            let isCrash = true;
+            if((piece.bottom < obsPiece.top) || (piece.top > obsPiece.bottom) || (piece.right < obsPiece.left) || (piece.left > obsPiece.right)) {
+                isCrash = false;
+            }
+            return isCrash;
         }
     }
 }
@@ -97,7 +127,7 @@ function updateGameArea() {
     if(gameStatus) {
         gameArea.clear();
         updateObstacles();
-        gamePiece.newPos();
+        gamePiece.newPos('player');
         gamePiece.update();
     }
 }
