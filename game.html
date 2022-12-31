@@ -2,12 +2,11 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Game</title>
+    <title>Dodge Game</title>
     <script src="./index.js"></script>
     <style>
         canvas {
             border: 1px solid #d3d3d3;
-            background-color: #f1f1f1;
         }
         #screen {
             width: 100%;
@@ -22,12 +21,30 @@
         #canvasHolder {
             position: relative;
             width: fit-content;
+            background-image: url('assets/sky-background.png');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            margin: auto;
+            padding: auto;
+        }
+        #top-bar {
+            display: flexbox;
+        }
+        #top-bar div {
+            float: right;
         }
     </style>
 </head>
 
 <body onload="setupGame()">
-    <p>Test Game</p>
+    <div id="top-bar">
+        <span>Dodge Game</span>
+        <div>
+            <span>Score:</span>
+            <span id="score"></span>
+        </div>
+    </div>
     <div id="canvasHolder">
         <div id="screen">
             <button onclick="startGame()"><img src="./assets/start.png" alt="Start Game"/></button>
